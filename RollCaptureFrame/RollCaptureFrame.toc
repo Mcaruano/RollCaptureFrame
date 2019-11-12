@@ -1,0 +1,10 @@
+## Interface: 11302
+## Title: Roll Capture Frame
+## Author: Akaran - <Theres No Tomorrow> - Whitemane [A]
+## Version: 1.0
+## Notes: Simple AddOn which captures all roll events and displays them in a convenient table, sorted by roll, Descending.
+## SavedVariablesPerCharacter: RCFAutoLaunch, RCFNotifyDuplicateRolls, RCFMaxRoll
+
+RollCaptureFrame.lua
+RCFUI.lua
+RCFFrame.xml
