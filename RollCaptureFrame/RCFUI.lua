@@ -8,6 +8,7 @@
 function RCFUI_ResetAndDisplayCaptureFrame()
     RollCaptureFrame:UpdateGroupRoster()
     -- TODO: Hide both the Announce and Tiebreaker buttons
+    -- TODO: Initialize all the player rows
 	RCF_RollResults = {}
 	return
 end

@@ -12,19 +12,8 @@ RCFMaxRoll = 100
 
 
 
--- Initial frame necessary to kick off the AddOn
-local frame = CreateFrame("FRAME", "RollCaptureFrameInitialLoadFrame")
-frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-local function eventHandler(self, event, ...)
-	RollCaptureFrame:RegisterCallback("ADDON_LOADED", RollCaptureFrame.Initialize, ...)
-	RollCaptureFrame:RegisterCallback("GROUP_ROSTER_UPDATE", RollCaptureFrame.UpdateGroupRoster)
-	RollCaptureFrame:RegisterCallback("CHAT_MSG_SYSTEM", RollCaptureFrame.ProcessRollResultAndUpdateFrame, ...)
-end
-frame:SetScript("OnEvent", eventHandler);
-
--- TODO: Make sure this actually receives the Args from the event
-function RollCaptureFrame.Initialize(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
-	if arg1 == "RollCaptureFrame" then --arg1 = addon name
+function RCF_OnEvent(event, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+	if event == "ADDON_LOADED" and arg1 == "RollCaptureFrame" then --arg1 = addon name
 		RCF_rollInProgress = false
 		if RCFAutoLaunch == nil then
 			RCFAutoLaunch = false
@@ -38,34 +27,33 @@ function RollCaptureFrame.Initialize(arg1, arg2, arg3, arg4, arg5, arg6, arg7, a
 		if RCF_GroupRosterAndRelatedMetadata == nil then
 			RCF_GroupRosterAndRelatedMetadata = {}
 		end
-	end
-end
-
-function RollCaptureFrame:UpdateGroupRoster()
-	-- Only allow updates to the group roster if a roll is not currently being resolved
-	if RCF_rollInProgress then
-		return
-	end
-	RCF_GroupRosterAndRelatedMetadata = {};
-	if UnitInRaid("player") then
-		for i = 1, GetNumGroupMembers() do
-			local name, _, group, _, class = GetRaidRosterInfo(i);
-			if not name then break; end
-			RCF_GroupRosterAndRelatedMetadata[name] = {
-				[1] = class, -- The player's class
-				[2] = group -- The raid group the player is in
-			};
+	elseif event == "GROUP_ROSTER_UPDATE" then
+		-- Only allow updates to the group roster if a roll is not currently being resolved
+		if RCF_rollInProgress then
+			return
 		end
-	else
-		-- TODO: Add 5man group handling?
-		return
+		RCF_GroupRosterAndRelatedMetadata = {};
+		if UnitInRaid("player") then
+			for i = 1, GetNumGroupMembers() do
+				local name, _, group, _, class = GetRaidRosterInfo(i);
+				if not name then break; end
+				RCF_GroupRosterAndRelatedMetadata[name] = {
+					[1] = class, -- The player's class
+					[2] = group -- The raid group the player is in
+				};
+			end
+		else
+			-- TODO: Add 5man group handling?
+			return
+		end
+	elseif event == "CHAT_MSG_SYSTEM" then
+		RollCaptureFrame:ProcessRollResultAndUpdateFrame(arg1)
 	end
-end
 
 
-function RollCaptureFrame:ProcessRollResultAndUpdateFrame(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9)
+function RollCaptureFrame:ProcessRollResultAndUpdateFrame(chatMsg)
 	-- Regex matches "Akaran rolls 1 (1-100)"
-	local name, rollResult, minRoll, maxRoll = arg1:match("^(.+) rolls (%d+) %((%d+)%-(%d+)%)$")
+	local name, rollResult, minRoll, maxRoll = chatMsg:match("^(.+) rolls (%d+) %((%d+)%-(%d+)%)$")
 
 	-- This is how we test to make sure we're processing a Roll Event of the
 	-- range specified by RCFMaxRoll
@@ -247,32 +235,7 @@ function SlashCmdList.RCF(msg, editbox)
 		CEPGP_print("|cFFFF8080 RollCaptureFrame does not currently support any arguments. You can configure everything via the UI.|r", true);
 	end
 	RCF_rollInProgress = true
-	RCFUI_ResetAndDisplayCaptureFrame()
-end
-
-
-
-------------------------------
--- Event/Callback Functions --
-------------------------------
-
--- Callback registration logic lifted from user "zork" on the wowinterface.com forums:
--- Thread: https://www.wowinterface.com/forums/showthread.php?t=54358
-function RollCaptureFrame:RegisterCallback(event, callback, ...)
-	if not self.eventFrame then self.eventFrame = CreateFrame("Frame") end
-	function self.eventFrame:OnEvent(event, ...)
-		for callback, args in next, self.callbacks[event] do
-			callback(args, ...)
-		end
-	end
-	self.eventFrame:SetScript("OnEvent", self.eventFrame.OnEvent)
-	if not self.eventFrame.callbacks then self.eventFrame.callbacks = {} end
-	if not self.eventFrame.callbacks[event] then self.eventFrame.callbacks[event] = {} end
-	self.eventFrame.callbacks[event][callback] = {...}
-	self.eventFrame:RegisterEvent(event)
-end
-function RollCaptureFrame:UnregisterEvent(event)
-	self.eventFrame:UnregisterEvent(event)
+	ShowUIPanel(CEPGP_frame)
 end
 
 

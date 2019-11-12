@@ -1,0 +1,450 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script File="RollCaptureFrame.lua"/>
+	<Script File="RCFUI.lua"/>
+		
+	<Frame name="RCF_frame" parent="UIParent" hidden="true" enableMouse="true" toplevel="true" movable="true" clampedToScreen="true">
+		<Size>
+			<AbsDimension x="450" y="480" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<Color r="0" g="0" b="0" />
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Frames>
+			<Button name="CEPGP_button_guild" inherits="GameMenuButtonTemplate" text="All">
+				<Size>
+					<AbsDimension x="80" y="21" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="CEPGP_frame">
+						<Offset>
+							<AbsDimension x="10" y="-12" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound(799);
+						CEPGP_toggleFrame("CEPGP_guild");
+						CEPGP_mode = "guild";
+						CEPGP_populateFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="RCF_frame_close" inherits="UIPanelCloseButton">
+				<Size>
+					<AbsDimension x="40" y="40" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-3" y="-3" />
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						PlaySound(799);
+						RCF_frame:Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="CEPGP_guild" inherits="CEPGPFrameTemplate">				
+				<Frames>
+					<CheckButton name="CEPGP_all_need_check" inherits="UIOptionsCheckButtonTemplate" checked="1">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="CEPGP_frame_close">
+								<Offset>
+									<AbsDimension x="-10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:RegisterForClicks('LeftButtonDown');
+							</OnLoad>
+							<OnClick>
+								if self:GetChecked() then
+									CEPGP_all_greed_check:SetChecked(nil);
+								else
+									self:SetChecked(1);
+								end
+								TnTDKP_displayMode = "priority";
+								CEPGP_UpdateAllMembersScrollBar();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<CheckButton name="CEPGP_all_greed_check" inherits="UIOptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="CEPGP_frame_close">
+								<Offset>
+									<AbsDimension x="-10" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:RegisterForClicks('LeftButtonDown');
+							</OnLoad>
+							<OnClick>
+								if self:GetChecked() then
+									CEPGP_all_need_check:SetChecked(nil);
+								else
+									self:SetChecked(1);
+								end
+								TnTDKP_displayMode = "lottery";
+								CEPGP_UpdateAllMembersScrollBar();
+							</OnClick>
+						</Scripts>
+					</CheckButton>
+					<Frame name="CEPGP_guild_scrollframe">
+						<Size>
+							<AbsDimension x="410" y="300"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="CEPGP_guild" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-75"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Frames>
+							<ScrollFrame name="GuildScrollFrame" inherits="FauxScrollFrameTemplate">
+								<Size>
+									<AbsDimension x="360" y="350"/>
+								</Size>
+								<Anchors>
+									<Anchor point="RIGHT">
+										<Offset>
+											<AbsDimension x="-7" y="0"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnVerticalScroll>
+										FauxScrollFrame_OnVerticalScroll(self, offset, 240, CEPGP_UpdateAllMembersScrollBar); 
+									</OnVerticalScroll>
+									<OnShow>
+										CEPGP_UpdateAllMembersScrollBar();
+									</OnShow>
+								</Scripts>
+							</ScrollFrame>
+							<Button name="GuildButton1" inherits="GuildButtonTemplate" id="1" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="5" y="-6"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton2" inherits="GuildButtonTemplate" id="2" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton1" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton3" inherits="GuildButtonTemplate" id="3" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton2" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton4" inherits="GuildButtonTemplate" id="4" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton3" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton5" inherits="GuildButtonTemplate" id="5" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton4" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton6" inherits="GuildButtonTemplate" id="6" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton5" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton7" inherits="GuildButtonTemplate" id="7" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton6" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton8" inherits="GuildButtonTemplate" id="8" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton7" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton9" inherits="GuildButtonTemplate" id="9" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton8" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton10" inherits="GuildButtonTemplate" id="10" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton9" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton11" inherits="GuildButtonTemplate" id="11" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton10" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton12" inherits="GuildButtonTemplate" id="12" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton11" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton13" inherits="GuildButtonTemplate" id="13" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton12" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton14" inherits="GuildButtonTemplate" id="14" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton13" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton15" inherits="GuildButtonTemplate" id="15" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton14" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton16" inherits="GuildButtonTemplate" id="16" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton15" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton17" inherits="GuildButtonTemplate" id="17" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton16" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Button name="GuildButton18" inherits="GuildButtonTemplate" id="18" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativeTo="GuildButton17" relativePoint="BOTTOMLEFT">
+										<Offset>
+											<AbsDimension x="0" y="-2"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+							</Button>
+							<Scripts>
+							<OnLoad>
+								self:SetBackdropColor(0.1, 0.1, 0.1);
+							</OnLoad>
+						</Scripts>
+						</Frames>
+					</Frame>
+					<!-- These are the Column headers -->
+					<Button name="CEPGP_guild_name" inherits="CEPGPHeaderButton" text="Name">
+						<Size>
+							<AbsDimension x="50" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="7" y="-50" />
+									<!--<AbsDimension x="40" y="0" />-->
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CEPGP_setCriteria(1, "All");
+							</OnClick>
+						</Scripts>
+					</Button>
+					<!-- This is a "Button" only so that I can easily align it with the others. There is no Sort for this -->
+					<Button name="CEPGP_guild_role" inherits="CEPGPHeaderButton" text="Role">
+						<Size>
+							<AbsDimension x="50" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="CEPGP_guild_name">
+								<Offset>
+									<AbsDimension x="153" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CEPGP_guild_EP" inherits="CEPGPHeaderButton" text="">
+						<Size>
+							<AbsDimension x="50" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="CEPGP_guild_role">
+								<Offset>
+									<AbsDimension x="121" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CEPGP_guild_GP" inherits="CEPGPHeaderButton" text="">
+						<Size>
+							<AbsDimension x="50" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="CEPGP_guild_EP">
+								<Offset>
+									<AbsDimension x="49.5" y="0" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="CEPGP_guild_PR" inherits="CEPGPHeaderButton" text="DKP">
+						<Size>
+							<AbsDimension x="50" y="20" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="-20" y="-50" />
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								CEPGP_setCriteria(4, "All");
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="CEPGP_all_need_check_text" inherits="GameFontNormal" text="Display Priority DKP">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="CEPGP_all_need_check">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="CEPGP_all_greed_check_text" inherits="GameFontNormal" text="Display Lottery DKP">
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="CEPGP_all_greed_check">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="CEPGP_guild_CEPGP_mode" inherits="GameFontNormal" text="Displaying All Records">
+							<Color r="1" g="1" b="1"/>
+							<Anchors>
+								<Anchor point="CENTER" relativePoint="TOP" />
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnShow>
+						<!-- Since the PRIORITY/LOTTERY CheckBoxes can be toggled on two different frames, we need to be sure they get properly initialized -->
+						if TnTDKP_displayMode == "lottery" then
+							CEPGP_all_greed_check:SetChecked(1);
+							CEPGP_all_need_check:SetChecked(nil);
+						else
+							CEPGP_all_greed_check:SetChecked(nil);
+							CEPGP_all_need_check:SetChecked(1);
+						end
+					</OnShow>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterEvent("ADDON_LOADED");
+				self:RegisterEvent("PLAYER_ENTERING_WORLD");
+				self:RegisterEvent("GROUP_ROSTER_UPDATE");
+				self:RegisterEvent("CHAT_MSG_SYSTEM");
+			</OnLoad>
+			<OnShow>
+				RCFUI_ResetAndDisplayCaptureFrame()
+			</OnShow>
+			<OnMouseDown>
+				self:StartMoving();
+			</OnMouseDown>
+			<OnMouseUp>
+				self:StopMovingOrSizing();
+			</OnMouseUp>
+			<OnEvent>
+				RCF_OnEvent(event, ...);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+</Ui>
