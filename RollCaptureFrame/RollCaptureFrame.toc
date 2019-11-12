@@ -8,3 +8,4 @@
 RollCaptureFrame.lua
 RCFUI.lua
 RCFFrame.xml
+Virtual.xml
